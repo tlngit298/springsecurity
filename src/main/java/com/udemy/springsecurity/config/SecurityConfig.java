@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,8 +23,9 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain customSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(requests -> requests
-                .requestMatchers("/contact").permitAll()
-                .anyRequest().authenticated());
+                .requestMatchers("/contact", "/register").permitAll()
+                .anyRequest().authenticated())
+                .csrf(AbstractHttpConfigurer::disable);
         httpSecurity.formLogin(withDefaults());
         httpSecurity.httpBasic(withDefaults());
         return httpSecurity.build();
