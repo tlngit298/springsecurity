@@ -24,9 +24,13 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain customSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(requests -> requests
-                .requestMatchers("/contact", "/register").permitAll()
+                .requestMatchers("/contact", "/register", "/invalid-session").permitAll()
                 .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable);
+        httpSecurity.sessionManagement(sm -> sm
+                .invalidSessionUrl("/invalid-session")
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(true));
         httpSecurity.formLogin(withDefaults());
         httpSecurity.httpBasic(h -> h.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
         httpSecurity.exceptionHandling(e -> e.accessDeniedHandler(new CustomAccessDeniedHandler()));
