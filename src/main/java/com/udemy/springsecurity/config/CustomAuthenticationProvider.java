@@ -1,7 +1,6 @@
 package com.udemy.springsecurity.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("!prod")
 @RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
@@ -25,7 +23,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
+        if (!passwordEncoder.matches(pwd, userDetails.getPassword())) {
+            throw new BadCredentialsException("Invalid username or password!");
+        }
         return new UsernamePasswordAuthenticationToken(
                 username, pwd, userDetails.getAuthorities());
     }
